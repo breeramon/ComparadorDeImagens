@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Comparador de Imagens</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h1>Comparador de Imagens</h1>
+
+    <div class="app-container">
+
+        <aside class="sidebar" id="sidebar-controls">
+            
+            <h3>2. Edite sua imagem</h3>
+            <div id="editor-controls">
+                <label for="slider-brilho">Brilho:</label>
+                <input type="range" id="slider-brilho" min="-100" max="100" value="0">
+                
+                <label for="slider-contraste">Contraste:</label>
+                <input type="range" id="slider-contraste" min="0.0" max="3.0" step="0.1" value="1.0">
+                
+                <label for="slider-saturacao">Saturação:</label>
+                <input type="range" id="slider-saturacao" min="0.0" max="3.0" step="0.1" value="1.0">
+
+                <label for="slider-rotacao">Rotação:</label>
+                <input type="range" id="slider-rotacao" min="-180" max="180" value="0">
+                
+                <label for="slider-redim">Redim (%):</label>
+                <input type="range" id="slider-redim" min="10" max="200" step="5" value="100">
+            </div>
+
+            <div class="button-group">
+                <button id="undo-button" title="Desfazer">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="redo-button" title="Refazer">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+            
+        </aside>
+
+        <main class="main-content">
+
+            <h3>1. Envie sua imagem</h3>
+            <input type="file" id="imageUploader" accept=".jpg, .jpeg, .png" class="input-file-hidden">
+            
+            <label for="imageUploader" class="btn-upload">Escolher arquivo</label>
+            
+            <span id="file-name-display">Nenhum arquivo selecionado</span>
+
+            <div id="preview-area">
+                <div>
+                    <h4>Original</h4>
+                    <img id="img-preview-original" src="" alt="Imagem Original">
+                </div>
+                <div>
+                    <h4>Edição (Ao Vivo)</h4>
+                    <img id="img-preview-edited" src="" alt="Pré-visualização da Edição">
+                </div>
+            </div>
+
+            <!-- <h3 >3. Compare!</h3> -->
+            <button id="compare-button" style="margin-top: 30px;">Comparar Imagem Editada</button>
+            <div id="status" style="margin-top: 10px; font-style: italic;"></div>
+
+            <h3>Resultados da Comparação</h3>
+
+            <p style="margin-top: 15px;">
+                <b>SSIM:</b> <span id="ssim-score">N/A</span> | 
+                <b>Diferença Média:</b> <span id="diff-media">N/A</span>
+            </p>
+            
+            <div id="results-area">
+                <div>
+                    <h4>Original (Resultado)</h4>
+                    <img id="result-img-original" src="" alt="Imagem Original">
+                </div>
+                <div>
+                    <h4>Editada (Resultado)</h4>
+                    <img id="result-img-edited" src="" alt="Imagem Editada">
+                </div>
+                <div>
+                    <h4>Mapa de Diferença (XOR)</h4>
+                    <img id="result-img-map" src="" alt="Mapa de Diferença">
+                </div>
+            </div>
+
+            <a href="/api/get_csv" target="_blank">
+                <button style="background-color: #17a2b8; margin-top: 10px;">Baixar Ranking (.csv)</button>
+            </a>
+
+        </main>
+    </div> <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

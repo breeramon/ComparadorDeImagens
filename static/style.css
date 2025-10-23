@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+body { 
+    font-family: 'Nunito', sans-serif;
+    margin: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    margin: 0;
+}
+
+button,
+.btn-download,
+.btn-upload {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+button:hover,
+.btn-download:hover,
+.btn-upload:hover {
+    background-color: #004b9b;
+}
+
+button:disabled { 
+    background-color: #ccc; 
+    cursor: not-allowed; 
+    transform: none;
+}
+
+.app-container {
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: none; /* Começa oculto */
+}
+
+.main-content {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#editor-controls { 
+    display: grid; 
+    grid-template-columns: 80px 1fr;
+    gap: 15px; 
+    align-items: center;
+    margin-top: 15px;
+}
+
+#preview-area, #results-area { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 10px; 
+}
+
+#preview-area div, #results-area div { 
+    border: 1px dashed #ddd; /* Borda tracejada para indicar "vazio" */
+    padding: 10px; 
+    text-align: center; 
+    flex: 1; 
+    border-radius: 8px; /* Bordas consistentes com os botões */
+    background-color: #f9f9f9; /* Fundo leve */
+    min-height: 200px; /* Evita que a página "pule" */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #999;
+}
+
+/* Esconde o texto "Original" etc, se a imagem estiver quebrada */
+img:not([src]) {
+    display: none;
+}
+img { 
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 4px; 
+    /* Adiciona a imagem de volta quando ela é carregada */
+    background: none; 
+    min-height: 0;
+}
+
+.input-file-hidden {
+    display: none;
+}
+
+#file-name-display {
+    margin-left: 10px;
+    font-style: italic;
+    color: #555;
+}
+
+.button-group {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+    justify-content: center; /* <-- Centraliza os botões */
+}
+
+.centered-section {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+}
+
+.button-group button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    /* Deixa eles com a mesma borda dos outros botões */
+    border-radius: 8px; 
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 8. NOVA FUNCIONALIDADE (UX): Feedback de Foco (Acessibilidade) --- */
+/* Mostra um anel de foco azul quando o usuário navega com o 'Tab' */
+button:focus,
+.btn-download:focus,
+.btn-upload:focus,
+input[type="range"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4);
+}
+
+/* --- 9. NOVA FUNCIONALIDADE (UX): Estilização dos Sliders --- */
+/* Deixa os sliders com a mesma identidade visual (azul) */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #eee;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Bolinha do slider (WebKit/Blink - Chrome, Safari, Edge) */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: transform 0.1s ease-in-out;
+}
+
+/* Bolinha do slider (Firefox) */
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 0;
+    transition: transform 0.1s ease-in-out;
+}
+
+/* Efeito de "agarrar" a bolinha */
+input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.2);
+}
+input[type="range"]::-moz-range-thumb:active {
+    transform: scale(1.2);
+}

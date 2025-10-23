@@ -1,0 +1,32 @@
+# --- Ambiente Virtual ---
+# Ignora a pasta do ambiente virtual
+venv/
+/venv/
+
+# --- Arquivos de Cache do Python ---
+# Ignora pastas de cache
+__pycache__/
+*.py[cod]
+
+# --- Arquivos Gerados pela Aplicação ---
+# Ignora as imagens enviadas pelos usuários e os resultados
+# O "!" nega a regra, então mantemos as pastas, mas ignoramos os arquivos DENTRO delas.
+static/uploads/*
+!static/uploads/.gitkeep
+static/results/*
+!static/results/.gitkeep
+
+# --- Arquivos de IDE / Editor de Texto ---
+# Ignora configurações do Visual Studio Code
+.vscode/
+
+# --- Arquivos de Sistema Operacional ---
+# Ignora arquivos de sistema do macOS
+.DS_Store
+# Ignora arquivos de cache de thumbnail do Windows
+Thumbs.db
+
+# --- Outros ---
+# Ignora arquivos de variáveis de ambiente (se você usar)
+.env
+.flaskenv
