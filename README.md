@@ -50,4 +50,19 @@ O nosso projeto implementa as seguintes tarefas:
 
 ## 6. Professora
 
-* **Layse Santos Souza** 
+* **Layse Santos Souza**
+
+## 7. Fotos do Projeto
+
+<img width="3839" height="2159" alt="image" src="https://github.com/user-attachments/assets/d1893334-6964-4dc0-89b8-5a0e4abe053e" />
+
+<img width="3834" height="2159" alt="image" src="https://github.com/user-attachments/assets/aafb109a-aeee-4499-ab8c-3211ff569f86" />
+
+<img width="3839" height="1933" alt="image" src="https://github.com/user-attachments/assets/e769d369-0550-44c9-85b4-fab8e3537453" />
+
+<img width="3839" height="2159" alt="image" src="https://github.com/user-attachments/assets/008584e5-bcef-4707-b5d9-c2c5ed17c08c" />
+
+<img width="3826" height="2159" alt="image" src="https://github.com/user-attachments/assets/0d1ce0fd-a375-4829-8576-4b175984e705" />
+
+<img width="997" height="618" alt="image" src="https://github.com/user-attachments/assets/f58ee81f-ed93-46bd-a454-1b2a213a21fc" />
+
