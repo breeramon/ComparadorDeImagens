@@ -62,6 +62,10 @@ O nosso projeto implementa as seguintes tarefas:
 
 <img width="3839" height="2159" alt="image" src="https://github.com/user-attachments/assets/008584e5-bcef-4707-b5d9-c2c5ed17c08c" />
 
+<img width="3834" height="2159" alt="image" src="https://github.com/user-attachments/assets/9bf74987-63e9-40f3-8ef3-03d91448f694" />
+
+<img width="3839" height="2159" alt="image" src="https://github.com/user-attachments/assets/8afc7db8-39f4-4fb9-8098-e73d86f091b3" />
+
 <img width="3826" height="2159" alt="image" src="https://github.com/user-attachments/assets/0d1ce0fd-a375-4829-8576-4b175984e705" />
 
 <img width="997" height="618" alt="image" src="https://github.com/user-attachments/assets/f58ee81f-ed93-46bd-a454-1b2a213a21fc" />
