@@ -6,6 +6,7 @@ const compareButton = document.getElementById('compare-button');
 const statusDiv = document.getElementById('status');
 const sidebar = document.getElementById('sidebar-controls'); // Pega a sidebar
 const fileNameDisplay = document.getElementById('file-name-display');
+const uploadErrorDiv = document.getElementById('upload-error');
 
 // Sliders
 const sliders = {
@@ -14,6 +15,14 @@ const sliders = {
     saturacao: document.getElementById('slider-saturacao'),
     rotacao: document.getElementById('slider-rotacao'),
     redim: document.getElementById('slider-redim')
+};
+
+const sliderValues = {
+    brilho: document.getElementById('value-brilho'),
+    contraste: document.getElementById('value-contraste'),
+    saturacao: document.getElementById('value-saturacao'),
+    rotacao: document.getElementById('value-rotacao'),
+    redim: document.getElementById('value-redim')
 };
 
 // Botões de Undo/Redo
@@ -36,11 +45,21 @@ const resultImgMap = document.getElementById('result-img-map');
 
 // Limite de 5MB
 const TAMANHO_MAX_BYTES = 5 * 1024 * 1024;
+const TAMANHO_MAX_MB = 5; 
+const EXTENSOES_PERMITIDAS = ['.jpg', '.jpeg', '.png'];
 
 // --- 2. Histórico de Edição (Request 3) ---
 let editHistory = []; // Pilha para Desfazer
 let redoStack = [];   // Pilha para Refazer
 let currentFile = null; // Para guardar o arquivo selecionado
+
+const defaultState = {
+    brilho: 0,
+    contraste: 1.0,
+    saturacao: 1.0,
+    rotacao: 0,
+    redim: 100
+};
 
 function getCurrentState() {
     return {
@@ -58,6 +77,15 @@ function applyState(state) {
     sliders.saturacao.value = state.saturacao;
     sliders.rotacao.value = state.rotacao;
     sliders.redim.value = state.redim;
+
+    for (const key in state) {
+        if (sliders[key] && sliderValues[key]) {
+            // 1. Define a posição do slider
+            sliders[key].value = state[key];
+            // 2. Define o texto do <span>
+            sliderValues[key].textContent = state[key];
+        }
+    }
 }
 
 function saveState() {
@@ -72,20 +100,35 @@ function saveState() {
 uploader.addEventListener('change', () => {
     const file = uploader.files[0];
 
+    statusDiv.innerText = "";
+    uploadErrorDiv.innerText = "";
+
     if (!file) {
         fileNameDisplay.textContent = "Nenhum arquivo selecionado";
         return;
     }
-    fileNameDisplay.textContent = file.name;
 
-    if (file.size > TAMANHO_MAX_BYTES) {
-        statusDiv.innerText = "Erro: A imagem é maior que 5MB!";
+    const nomeArquivo = file.name.toLowerCase();
+    // Verifica se o nome do arquivo termina com alguma das extensões permitidas
+    const extensaoValida = EXTENSOES_PERMITIDAS.some(ext => nomeArquivo.endsWith(ext));
+
+    if (!extensaoValida) {
+        uploadErrorDiv.innerText = `Erro: Formato de arquivo inválido. Use apenas ${EXTENSOES_PERMITIDAS.join(', ')}.`;
+        fileNameDisplay.textContent = "Formato inválido!";
         uploader.value = ""; 
         sidebar.style.display = 'none'; 
+        return; 
+    }
+
+    if (file.size > TAMANHO_MAX_BYTES) {
+        uploadErrorDiv.innerText = `Erro: O arquivo é maior que o limite de ${TAMANHO_MAX_MB}MB.`;
         fileNameDisplay.textContent = "Arquivo muito grande! Escolha outro.";
+        uploader.value = ""; 
+        sidebar.style.display = 'none'; 
         return;
     }
 
+    fileNameDisplay.textContent = file.name;
     currentFile = file; 
     statusDiv.innerText = "Imagem carregada. Mova os sliders para editar.";
     sidebar.style.display = 'block'; // **** VERIFICAÇÃO **** MOSTRA a sidebar
@@ -98,6 +141,7 @@ uploader.addEventListener('change', () => {
     };
     reader.readAsDataURL(file);
 
+    applyState(defaultState);
     editHistory = []; 
     saveState();
 });
@@ -108,7 +152,10 @@ async function updatePreview() {
         statusDiv.innerText = "Erro: Nenhuma imagem selecionada.";
         return;
     }
+
     statusDiv.innerText = "Atualizando pré-visualização...";
+    uploadErrorDiv.innerText = "";
+
     const formData = new FormData();
     formData.append('originalImage', currentFile);
     
@@ -132,7 +179,19 @@ async function updatePreview() {
     }
 }
 
-Object.values(sliders).forEach(slider => {
+Object.keys(sliders).forEach(key => {
+    const slider = sliders[key];
+    const valueSpan = sliderValues[key];
+
+    slider.addEventListener('input', () => {
+        let valor = parseFloat(slider.value);
+        if (key === 'contraste' || key === 'saturacao') {
+             valueSpan.textContent = valor.toFixed(1); 
+        } else {
+             valueSpan.textContent = valor;
+        }
+    });
+
     slider.addEventListener('change', () => {
         saveState();      
         updatePreview();  
@@ -172,6 +231,8 @@ compareButton.addEventListener('click', async () => {
         return;
     }
     statusDiv.innerText = "Enviando para o back-end... Processando COMPARAÇÃO FINAL...";
+    uploadErrorDiv.innerText = "";
+
     const formData = new FormData();
     formData.append('originalImage', currentFile);
     
@@ -192,8 +253,7 @@ compareButton.addEventListener('click', async () => {
         
         const timestamp = new Date().getTime();
         
-        // **** CORREÇÃO FEITA AQUI ****
-        // Agora populamos as 3 imagens na área de resultados
+        // Agora popula as 3 imagens na área dos resultados
         resultImgOriginal.src = results.original_url + '?t=' + timestamp;
         resultImgEdited.src = results.edited_url + '?t=' + timestamp;
         resultImgMap.src = results.diff_map_url + '?t=' + timestamp;

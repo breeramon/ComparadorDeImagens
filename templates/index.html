@@ -20,18 +20,23 @@
             <div id="editor-controls">
                 <label for="slider-brilho">Brilho:</label>
                 <input type="range" id="slider-brilho" min="-100" max="100" value="0">
+                <span id="value-brilho" class="slider-value">0</span>
                 
                 <label for="slider-contraste">Contraste:</label>
                 <input type="range" id="slider-contraste" min="0.0" max="3.0" step="0.1" value="1.0">
-                
+                <span id="value-contraste" class="slider-value">1.0</span>
+
                 <label for="slider-saturacao">Saturação:</label>
                 <input type="range" id="slider-saturacao" min="0.0" max="3.0" step="0.1" value="1.0">
+                <span id="value-saturacao" class="slider-value">1.0</span>
 
                 <label for="slider-rotacao">Rotação:</label>
                 <input type="range" id="slider-rotacao" min="-180" max="180" value="0">
-                
+                <span id="value-rotacao" class="slider-value">0</span>
+
                 <label for="slider-redim">Redim (%):</label>
-                <input type="range" id="slider-redim" min="10" max="200" step="5" value="100">
+                <input type="range" id="slider-redim" min="10" max="200" step="5" value="100"> 
+                <span id="value-redim" class="slider-value">100</span>
             </div>
 
             <div class="button-group">
@@ -48,11 +53,11 @@
         <main class="main-content">
 
             <h3>1. Envie sua imagem</h3>
-            <input type="file" id="imageUploader" accept=".jpg, .jpeg, .png" class="input-file-hidden">
-            
-            <label for="imageUploader" class="btn-upload">Escolher arquivo</label>
-            
-            <span id="file-name-display">Nenhum arquivo selecionado</span>
+                <input type="file" id="imageUploader" accept=".jpg, .jpeg, .png" class="input-file-hidden">
+                <label for="imageUploader" class="btn-upload">Escolher arquivo</label>
+                <span id="file-name-display">Nenhum arquivo selecionado</span>
+               
+                <div id="upload-error" class="error-message"></div> 
 
             <div id="preview-area">
                 <div>

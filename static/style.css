@@ -47,6 +47,7 @@ button:disabled {
     display: flex;
     margin: 20px;
     gap: 20px;
+    align-items: flex-start;
 }
 
 .sidebar {
@@ -56,6 +57,13 @@ button:disabled {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     display: none; /* Começa oculto */
+    /* Faz a barra lateral "grudar" na tela */
+    position: sticky;
+    /* Define a distância do topo onde ela deve "grudar" */
+    top: 20px; 
+    /* (Bônus de UX): Se a sidebar for maior que a tela, ela terá seu próprio scroll */
+    max-height: calc(100vh - 40px); /* 100% da altura da tela - margens */
+    overflow-y: auto; /* Adiciona scroll SÓ na sidebar se for preciso */
 }
 
 .main-content {
@@ -68,7 +76,7 @@ button:disabled {
 
 #editor-controls { 
     display: grid; 
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 80px 1fr 50px;
     gap: 15px; 
     align-items: center;
     margin-top: 15px;
@@ -102,7 +110,6 @@ img {
     max-width: 100%; 
     height: auto; 
     border-radius: 4px; 
-    /* Adiciona a imagem de volta quando ela é carregada */
     background: none; 
     min-height: 0;
 }
@@ -195,4 +202,18 @@ input[type="range"]::-webkit-slider-thumb:active {
 }
 input[type="range"]::-moz-range-thumb:active {
     transform: scale(1.2);
+}
+
+.error-message {
+    color: #D8000C;
+    font-weight: 700;
+    margin-top: 10px;
+    /* A altura será 0 quando vazio, e crescerá quando tiver texto */
+}
+
+.slider-value {
+    text-align: right;
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap; 
 }
