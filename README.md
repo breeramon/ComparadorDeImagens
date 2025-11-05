@@ -39,7 +39,15 @@ O nosso projeto implementa as seguintes tarefas:
 * **Inserir prints e tabelas de comparação.**
 * **Adicionar uma descrição técnica aqui no README**
 
-## 5. Equipe (Grupo 6) e Responsabilidades
+## 5. Dependências
+
+* **Para o Back-end**
+* **Arquivo requirementns.txt.**
+
+* **Para o Front-end**
+* **Next.Js = 16.0.1.**
+
+## 6. Equipe (Grupo 6) e Responsabilidades
 
 * **Bernardo Rafael Castro Rezende** - Implementação das funções de edição.
 * **Breno Ramon Santana dos Santos** - Testes de usabilidade e correção de bugs.
@@ -48,11 +56,11 @@ O nosso projeto implementa as seguintes tarefas:
 * **Raphael Vinícius Batista Uchoa Dias** - Design e layout da interface.
 * **Vinicius Américo Damasceno Feitoza** - Coordenação e supervisão geral do projeto.
 
-## 6. Professora
+## 7. Professora
 
 * **Layse Santos Souza**
 
-## 7. Fotos do Projeto
+## 8. Fotos do Projeto
 
 <img width="3839" height="2159" alt="image" src="https://github.com/user-attachments/assets/d1893334-6964-4dc0-89b8-5a0e4abe053e" />
 
