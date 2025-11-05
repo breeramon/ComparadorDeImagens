@@ -42,10 +42,10 @@ O nosso projeto implementa as seguintes tarefas:
 ## 5. Dependências
 
 * **Para o Back-end**
-* **Arquivo requirementns.txt.**
+* Arquivo requirementns.txt.
 
 * **Para o Front-end**
-* **Next.Js = 16.0.1.**
+* Next.Js = 16.0.1.
 
 ## 6. Equipe (Grupo 6) e Responsabilidades
 
