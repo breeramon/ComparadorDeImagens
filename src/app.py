@@ -1,49 +1,35 @@
-# app.py
-
-# Imports que ESTE ARQUIVO precisa
 from flask import Flask, request, jsonify, send_from_directory, render_template, send_file
 import os
-import cv2 as cv # Precisamos do cv.imwrite
+import cv2 as cv
 import pandas as pd
-# IMPORTA O NOSSO OUTRO ARQUIVO
 import image_utils as utils 
 
-# --- Configuração do Servidor ---
-app = Flask(__name__)
-# Define o tamanho máximo de upload (5MB), como você pediu
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
-# Extensões permitidas
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-# Pastas (caminhos)
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 RESULT_FOLDER = os.path.join('static', 'results')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
-# Garante que as pastas existam
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-# --- 2. LISTA GLOBAL PARA GUARDAR RESULTADOS ---
 all_results = []
 
-# Função auxiliar para checar extensão
 def arquivo_permitido(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# --- Nossas Rotas (Endpoints) ---
 
 @app.route('/')
 def index():
-    # Por enquanto, só um teste. Depois, isso servirá o index.html
     return render_template('index.html')
 
 @app.route('/api/compare', methods=['POST'])
 def handle_comparison():
     
-    # --- 1. Validação da Imagem Original ---
     if 'originalImage' not in request.files:
         return jsonify({"error": "Nenhum arquivo 'originalImage' enviado"}), 400
         
@@ -55,17 +41,14 @@ def handle_comparison():
     if not file_original or not arquivo_permitido(file_original.filename):
         return jsonify({"error": "Formato de arquivo não permitido"}), 400
         
-    # --- 2. Receber Parâmetros de Edição ---
-    # Recebe os valores dos sliders (com valores padrão)
+
     brilho = int(request.form.get('brilho', 0))
     contraste = float(request.form.get('contraste', 1.0))
     saturacao = float(request.form.get('saturacao', 1.0))
     rotacao = int(request.form.get('rotacao', 0))
     redim = int(request.form.get('redim', 100))
 
-    # --- 3. Processamento (Usando image_utils.py) ---
-    
-    # Salva o arquivo original temporariamente
+
     caminho_original = os.path.join(app.config['UPLOAD_FOLDER'], file_original.filename)
     file_original.save(caminho_original)
 
@@ -185,32 +168,24 @@ def get_csv():
     # 1. Converte a lista de resultados em um DataFrame do Pandas
     df = pd.DataFrame(all_results)
     
-    # 2. Cria o ranking (Tarefa 5)
-    #    Vamos rankear pelo SSIM (quanto maior, melhor)
     df_ranking = df.sort_values(by="ssim_score", ascending=False)
     
-    # 3. Adiciona a coluna de Ranking
     df_ranking['Ranking_Qualidade'] = range(1, len(df_ranking) + 1)
     
-    # 4. Salva o arquivo CSV temporariamente (Tarefa 4)
     csv_path = os.path.join(app.config['RESULT_FOLDER'], 'ranking_resultados.csv')
-    df_ranking.to_csv(csv_path, index=False, sep=';', decimal=',') # (Use ; e , para Excel BR)
+    df_ranking.to_csv(csv_path, index=False, sep=';', decimal=',')
     
-    # 5. Envia o arquivo para o usuário fazer o download
     return send_file(
         csv_path,
         as_attachment=True,
-        download_name='Ranking_Comparacoes.csv', # Nome que o usuário verá
+        download_name='Ranking_Comparacoes.csv',
         mimetype='text/csv'
     )
 
-# --- Rota para servir as imagens salvas ---
 @app.route('/static/<path:path>')
 def send_static_file(path):
     return send_from_directory('static', path)
 
 
-# --- Código para Rodar o Servidor ---
 if __name__ == '__main__':
-    # debug=True faz o servidor reiniciar automaticamente quando você salva o arquivo
     app.run(debug=True)
