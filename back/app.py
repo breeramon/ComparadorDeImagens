@@ -16,8 +16,8 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # Pastas (caminhos)
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-RESULT_FOLDER = os.path.join('static', 'results')
+UPLOAD_FOLDER = os.path.join('../static', 'uploads')
+RESULT_FOLDER = os.path.join('../static', 'results')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
@@ -207,7 +207,7 @@ def get_csv():
 # --- Rota para servir as imagens salvas ---
 @app.route('/static/<path:path>')
 def send_static_file(path):
-    return send_from_directory('static', path)
+    return send_from_directory('../static', path)
 
 
 # --- Código para Rodar o Servidor ---

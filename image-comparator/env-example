@@ -1,0 +1,5 @@
+
+ARRUME ESS ARQUIVO PARA : .env.local
+
+
+NEXT_PUBLIC_API_URL=http://localhost:5000
