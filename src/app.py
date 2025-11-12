@@ -145,7 +145,7 @@ def get_csv():
     if not all_results:
         return jsonify({"error": "Nenhum resultado para rankear ainda."}), 400
     
-    df = pd.DataFrame(all_results)
+        df = pd.DataFrame(all_results)
     
     df_ranking = df.sort_values(by="ssim_score", ascending=False)
     
