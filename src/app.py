@@ -130,7 +130,6 @@ def handle_preview():
     nome_preview_original = "preview_original.png" 
     nome_preview_editada = "preview_editada.png"
 
-    # 2. Criamos os CAMINHOS ABSOLUTOS (para salvar)
     caminho_original = os.path.join(app.config['UPLOAD_FOLDER'], nome_preview_original)
     caminho_editada = os.path.join(app.config['RESULT_FOLDER'], nome_preview_editada)
     
