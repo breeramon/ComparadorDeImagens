@@ -4,12 +4,16 @@ import cv2 as cv
 import pandas as pd
 import image_utils as utils 
 
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
+basedir = os.path.abspath(os.path.dirname(__file__))
+root_dir = os.path.abspath(os.path.join(basedir, '..'))
+
+app = Flask(__name__, template_folder=os.path.join(root_dir, 'templates'), static_folder=os.path.join(root_dir, 'static'))
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-UPLOAD_FOLDER = os.path.join('static', 'uploads')
-RESULT_FOLDER = os.path.join('static', 'results')
+UPLOAD_FOLDER = os.path.join(root_dir, 'static', 'uploads')
+RESULT_FOLDER = os.path.join(root_dir, 'static', 'results')
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
@@ -48,8 +52,15 @@ def handle_comparison():
     rotacao = int(request.form.get('rotacao', 0))
     redim = int(request.form.get('redim', 100))
 
+    nome_original_salvo = file_original.filename
+    nome_base_arquivo = "resultado_" + nome_original_salvo
+    nome_editada = "editada_" + nome_base_arquivo
+    nome_mapa = "mapa_" + nome_base_arquivo
 
-    caminho_original = os.path.join(app.config['UPLOAD_FOLDER'], file_original.filename)
+    caminho_original = os.path.join(app.config['UPLOAD_FOLDER'], nome_original_salvo)
+    caminho_editada = os.path.join(app.config['RESULT_FOLDER'], nome_editada)
+    caminho_mapa = os.path.join(app.config['RESULT_FOLDER'], nome_mapa)
+
     file_original.save(caminho_original)
 
     img_original = utils.ler_imagem(caminho_original)
@@ -68,10 +79,6 @@ def handle_comparison():
 
     ssim = utils.calcular_ssim(img_original_redim, img_editada)
     diff_media = utils.calcular_diferenca_media(img_original_redim, img_editada)
-    
-    nome_base_arquivo = "resultado_" + file_original.filename
-    caminho_editada = os.path.join(app.config['RESULT_FOLDER'], "editada_" + nome_base_arquivo)
-    caminho_mapa = os.path.join(app.config['RESULT_FOLDER'], "mapa_" + nome_base_arquivo)
 
     cv.imwrite(caminho_editada, img_editada)
     cv.imwrite(caminho_mapa, mapa_dif)
@@ -89,12 +96,16 @@ def handle_comparison():
     }
     all_results.append(result_data)
 
+    url_original = f"static/uploads/{nome_original_salvo}"
+    url_editada = f"static/results/{nome_editada}"
+    url_mapa = f"static/results/{nome_mapa}"
+
     return jsonify({
         'ssim_score': ssim,
         'diferenca_media': diff_media,
-        'original_url': caminho_original,
-        'edited_url': caminho_editada,
-        'diff_map_url': caminho_mapa
+        'original_url': url_original,
+        'edited_url': url_editada,
+        'diff_map_url': url_mapa
     })
 
 @app.route('/api/preview', methods=['POST'])
@@ -117,7 +128,12 @@ def handle_preview():
     redim = int(request.form.get('redim', 100))
 
     nome_preview_original = "preview_original.png" 
+    nome_preview_editada = "preview_editada.png"
+
+    # 2. Criamos os CAMINHOS ABSOLUTOS (para salvar)
     caminho_original = os.path.join(app.config['UPLOAD_FOLDER'], nome_preview_original)
+    caminho_editada = os.path.join(app.config['RESULT_FOLDER'], nome_preview_editada)
+    
     file_original.save(caminho_original)
 
     img_original = utils.ler_imagem(caminho_original)
@@ -131,12 +147,12 @@ def handle_preview():
     img_editada = utils.rotacionar_imagem_skimage(img_editada, rotacao)
     img_editada = utils.redimensionar_imagem(img_editada, redim)
     
-    nome_preview_editada = "preview_editada.png"
-    caminho_editada = os.path.join(app.config['RESULT_FOLDER'], nome_preview_editada)
     cv.imwrite(caminho_editada, img_editada)
 
+    url_editada = f"static/results/{nome_preview_editada}"
+
     return jsonify({
-        'edited_url': caminho_editada
+        'edited_url': url_editada
     })
 
 @app.route('/api/get_csv')
@@ -163,7 +179,7 @@ def get_csv():
 
 @app.route('/static/<path:path>')
 def send_static_file(path):
-    return send_from_directory('static', path)
+    return send_from_directory(app.static_folder, path)
 
 
 if __name__ == '__main__':
