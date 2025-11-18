@@ -1,5 +1,3 @@
-// types.ts - Definições de tipos para o projeto
-
 export interface EditorState {
     brilho: number;
     contraste: number;

@@ -1,13 +1,12 @@
-// page.tsx
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import ImageUploader from './components/ImageUploader';
-import ImageEditor from './components/ImageEditor';
-import PreviewPanel from './components/PreviewPanel';
-import ComparisonResults from './components/ComparisonResults';
-import { EditorState, DEFAULT_STATE, ComparisonResult } from './lib/types';
-import { previewImage, compareImages, downloadCSV } from './lib/api';
+import ImageUploader from '../components/ImageUploader';
+import ImageEditor from '../components/ImageEditor';
+import PreviewPanel from '../components/PreviewPanel';
+import ComparisonResults from '../components/ComparisonResults';
+import { EditorState, DEFAULT_STATE, ComparisonResult } from '../lib/types';
+import { previewImage, compareImages, downloadCSV } from '../lib/api';
 
 export default function Home() {
     const [currentFile, setCurrentFile] = useState<File | null>(null);

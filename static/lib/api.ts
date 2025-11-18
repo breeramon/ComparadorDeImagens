@@ -1,5 +1,3 @@
-// api.ts - Funções para comunicação com o backend Flask
-
 import { EditorState, ComparisonResult, PreviewResult } from './types';
 
 const API_URL = 'http://localhost:5000';
