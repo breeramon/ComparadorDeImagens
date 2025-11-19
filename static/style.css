@@ -62,7 +62,6 @@ body {
     min-height: 70vh;
 }
 
-/* Sidebar */
 .sidebar {
     background: var(--surface);
     border-radius: 20px;
@@ -205,7 +204,6 @@ input[type="range"]::-moz-range-thumb {
     flex-direction: column;
 }
 
-/* Estados das seções - CORRIGIDO */
 .section {
     display: none;
     flex: 1;
@@ -245,7 +243,6 @@ input[type="range"]::-moz-range-thumb {
     color: var(--text);
 }
 
-/* Upload Zone - CORRIGIDA E EXPANDIDA */
 .upload-zone {
     border: 3px dashed var(--border);
     border-radius: 16px;
@@ -346,7 +343,6 @@ input[type="range"]::-moz-range-thumb {
     font-size: 0.9rem;
 }
 
-/* Previews */
 .preview-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -404,7 +400,6 @@ input[type="range"]::-moz-range-thumb {
     font-style: italic;
 }
 
-/* Buttons */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -441,7 +436,6 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: var(--shadow-lg);
 }
 
-/* Status Messages */
 .status-message {
     padding: 16px 20px;
     border-radius: 12px;
@@ -465,7 +459,6 @@ input[type="range"]::-moz-range-thumb {
     border-left: 4px solid var(--error);
 }
 
-/* Metrics */
 .metrics {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -511,7 +504,6 @@ input[type="range"]::-moz-range-thumb {
     display: none;
 }
 
-/* Loading Spinner */
 .loading-spinner {
     display: inline-block;
     width: 20px;
@@ -522,7 +514,6 @@ input[type="range"]::-moz-range-thumb {
     animation: spin 1s linear infinite;
 }
 
-/* Animações */
 @keyframes fadeInDown {
     from {
         opacity: 0;
@@ -577,7 +568,6 @@ input[type="range"]::-moz-range-thumb {
     100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
     .app-container {
         grid-template-columns: 1fr;
