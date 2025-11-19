@@ -8,7 +8,6 @@ const fileInfoContainer = document.getElementById('file-info-container');
 const downloadCsv = document.getElementById('download-csv');
 const resetButton = document.getElementById('reset-button');
 
-// Sliders
 const sliders = {
     brilho: document.getElementById('slider-brilho'),
     contraste: document.getElementById('slider-contraste'),
@@ -25,37 +24,30 @@ const sliderValues = {
     redim: document.getElementById('value-redim')
 };
 
-// Botões
 const undoButton = document.getElementById('undo-button');
 const redoButton = document.getElementById('redo-button');
 
-// Imagens
 const imgPreviewOriginal = document.getElementById('img-preview-original');
 const imgPreviewEdited = document.getElementById('img-preview-edited');
 const resultImgOriginal = document.getElementById('result-img-original');
 const resultImgEdited = document.getElementById('result-img-edited');
 const resultImgMap = document.getElementById('result-img-map');
 
-// Métricas
 const ssimScoreEl = document.getElementById('ssim-score');
 const diffMediaEl = document.getElementById('diff-media');
 
-// Seções
 const sections = {
     upload: document.getElementById('section-upload'),
     preview: document.getElementById('section-preview'),
     analysis: document.getElementById('section-analysis')
 };
 
-// Botão para ir para análise
 const goToAnalysisBtn = document.getElementById('go-to-analysis');
 
-// Configurações
 const TAMANHO_MAX_BYTES = 5 * 1024 * 1024;
 const TAMANHO_MAX_MB = 5;
 const EXTENSOES_PERMITIDAS = ['.jpg', '.jpeg', '.png'];
 
-// Estado
 let editHistory = [];
 let redoStack = [];
 let currentFile = null;
@@ -70,27 +62,22 @@ const defaultState = {
     redim: 100
 };
 
-// Função para mudar de fase
 function goToPhase(phase) {
-    // Oculta todas as seções
     Object.values(sections).forEach(section => {
         if (section) {
             section.classList.remove('active');
         }
     });
 
-    // Mostra a seção desejada
     if (sections[phase]) {
         sections[phase].classList.add('active');
     }
 }
 
-// Inicialização - mostra apenas o upload
 document.addEventListener('DOMContentLoaded', function() {
     goToPhase('upload');
 });
 
-// Drag and Drop
 uploadZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadZone.classList.add('drag-over');
@@ -111,7 +98,6 @@ uploadZone.addEventListener('drop', (e) => {
     }
 });
 
-// Upload de arquivo
 uploader.addEventListener('change', () => {
     const file = uploader.files[0];
     if (file) {
@@ -143,7 +129,6 @@ function handleFileUpload(file) {
         return;
     }
 
-    // Mostra info do arquivo
     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
     fileInfoContainer.innerHTML = `
         <div class="file-info">
@@ -158,13 +143,11 @@ function handleFileUpload(file) {
     currentFile = file;
     showStatus('Imagem carregada com sucesso! Ajuste os controles para editar.', 'info');
 
-    // Mostra a sidebar e vai para a fase de preview
     sidebar.classList.add('visible');
     goToPhase('preview');
     compareButton.disabled = false;
     downloadCsv.disabled = false;
 
-    // Carrega preview
     const reader = new FileReader();
     reader.onload = (e) => {
         const dataUrl = e.target.result;
@@ -176,7 +159,6 @@ function handleFileUpload(file) {
         imgPreviewEdited.style.display = 'block';
         imgPreviewEdited.parentElement.querySelector('.preview-placeholder').style.display = 'none';
 
-        // Inicializa o canvas
         const img = new Image();
         img.onload = function() {
             canvas.width = img.width;
@@ -194,7 +176,6 @@ function handleFileUpload(file) {
     updatePreview();
 }
 
-// Gerenciamento de estado
 function getCurrentState() {
     return {
         brilho: parseInt(sliders.brilho.value),
@@ -226,23 +207,19 @@ function saveState() {
     updateButtonStates();
 }
 
-// Preview em tempo real
 function updatePreview() {
     if (!currentFile || !imgPreviewOriginal.src) return;
 
     const state = getCurrentState();
 
-    // Cria uma nova imagem para aplicar as transformações
     const img = new Image();
     img.onload = function() {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Aplica transformações
         ctx.filter = `brightness(${100 + state.brilho}%) contrast(${state.contraste * 100}%) saturate(${state.saturacao * 100}%)`;
 
-        // Aplica rotação
         if (state.rotacao !== 0) {
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -250,7 +227,6 @@ function updatePreview() {
             ctx.translate(-canvas.width / 2, -canvas.height / 2);
         }
 
-        // Aplica redimensionamento
         const scale = state.redim / 100;
         const scaledWidth = canvas.width * scale;
         const scaledHeight = canvas.height * scale;
@@ -263,13 +239,11 @@ function updatePreview() {
             ctx.restore();
         }
 
-        // Atualiza a imagem editada
         imgPreviewEdited.src = canvas.toDataURL();
     };
     img.src = imgPreviewOriginal.src;
 }
 
-// Configuração dos sliders
 Object.keys(sliders).forEach(key => {
     const slider = sliders[key];
     const valueSpan = sliderValues[key];
@@ -291,7 +265,6 @@ Object.keys(sliders).forEach(key => {
     });
 });
 
-// Undo/Redo
 undoButton.addEventListener('click', () => {
     if (editHistory.length < 2) return;
     const currentState = editHistory.pop();
@@ -311,7 +284,6 @@ redoButton.addEventListener('click', () => {
     updateButtonStates();
 });
 
-// Reset
 resetButton.addEventListener('click', () => {
     applyState(defaultState);
     saveState();
@@ -323,14 +295,12 @@ function updateButtonStates() {
     redoButton.disabled = redoStack.length === 0;
 }
 
-// Botão para ir para análise
 if (goToAnalysisBtn) {
     goToAnalysisBtn.addEventListener('click', () => {
         goToPhase('analysis');
     });
 }
 
-// Comparação final
 compareButton.addEventListener('click', async () => {
     if (!currentFile) {
         showError('Por favor, selecione uma imagem primeiro.');
@@ -341,20 +311,16 @@ compareButton.addEventListener('click', async () => {
     compareButton.innerHTML = '<span class="loading-spinner"></span> Analisando...';
 
     try {
-        // Simula uma análise
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // Resultados simulados
         const ssimScore = (0.8 + Math.random() * 0.19).toFixed(4);
         const diffMedia = (Math.random() * 25).toFixed(2);
 
         showStatus('Análise concluída com sucesso!', 'info');
 
-        // Atualiza as métricas
         ssimScoreEl.textContent = ssimScore;
         diffMediaEl.textContent = diffMedia;
 
-        // Atualiza as imagens de resultado
         resultImgOriginal.src = imgPreviewOriginal.src;
         resultImgOriginal.style.display = 'block';
         resultImgOriginal.parentElement.querySelector('.preview-placeholder').style.display = 'none';
@@ -363,21 +329,19 @@ compareButton.addEventListener('click', async () => {
         resultImgEdited.style.display = 'block';
         resultImgEdited.parentElement.querySelector('.preview-placeholder').style.display = 'none';
 
-        // Cria um mapa de diferença simulado
         const diffCanvas = document.createElement('canvas');
         const diffCtx = diffCanvas.getContext('2d');
         diffCanvas.width = canvas.width;
         diffCanvas.height = canvas.height;
 
-        // Gera um mapa de diferença simples
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
 
         for (let i = 0; i < data.length; i += 4) {
             const diff = Math.random() > 0.7 ? 255 : 0;
-            data[i] = diff;     // R
-            data[i + 1] = 0;    // G
-            data[i + 2] = 0;    // B
+            data[i] = diff;     
+            data[i + 1] = 0;    
+            data[i + 2] = 0;    
         }
 
         diffCtx.putImageData(imageData, 0, 0);
@@ -394,7 +358,6 @@ compareButton.addEventListener('click', async () => {
     }
 });
 
-// Download CSV
 downloadCsv.addEventListener('click', () => {
     const csvContent = "data:text/csv;charset=utf-8,"
         + "Nome,SSIM,Diferença Média\n"
@@ -409,7 +372,6 @@ downloadCsv.addEventListener('click', () => {
     document.body.removeChild(link);
 });
 
-// Funções de UI
 function showStatus(message, type) {
     statusDiv.innerHTML = `
         <div class="status-message status-${type}">
