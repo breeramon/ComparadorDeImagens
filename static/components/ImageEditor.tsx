@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Undo2, Redo2 } from 'lucide-react';
+import { Undo2, Redo2, Sun, Contrast, Palette, RotateCw, ZoomIn } from 'lucide-react';
 import { EditorState, SLIDER_CONFIGS } from '../lib/types';
 
+// Interface das props
 interface ImageEditorProps {
     state: EditorState;
     onChange: (key: keyof EditorState, value: number) => void;
@@ -12,6 +13,15 @@ interface ImageEditorProps {
     canUndo: boolean;
     canRedo: boolean;
 }
+
+// Configurações dos sliders
+const sliderConfigs = {
+    brilho: { icon: Sun, label: 'Brilho' },
+    contraste: { icon: Contrast, label: 'Contraste' },
+    saturacao: { icon: Palette, label: 'Saturação' },
+    rotacao: { icon: RotateCw, label: 'Rotação' },
+    redim: { icon: ZoomIn, label: 'Escala' },
+};
 
 export default function ImageEditor({
                                         state,
@@ -30,31 +40,33 @@ export default function ImageEditor({
         return value.toString() + config.unit;
     };
 
-    const sliderLabels = {
-        brilho: 'Brilho',
-        contraste: 'Contraste',
-        saturacao: 'Saturação',
-        rotacao: 'Rotação',
-        redim: 'Escala',
+    const getSliderBackground = (key: keyof EditorState, value: number) => {
+        const config = SLIDER_CONFIGS[key];
+        const percentage = ((value - config.min) / (config.max - config.min)) * 100;
+        return `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
     };
 
     return (
-        <div className="bg-gray-800 rounded-lg p-6 shadow-xl">
-            <h3 className="text-xl font-semibold mb-4">2. Edite sua imagem</h3>
+        <div className="space-y-6">
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Ajustes da Imagem</h3>
 
-            <div className="space-y-5">
                 {(Object.keys(state) as Array<keyof EditorState>).map((key) => {
                     const config = SLIDER_CONFIGS[key];
+                    const { icon: Icon, label } = sliderConfigs[key];
+
                     return (
-                        <div key={key}>
+                        <div key={key} className="mb-5 last:mb-0">
                             <div className="flex justify-between items-center mb-2">
-                                <label className="text-sm font-medium text-gray-300">
-                                    {sliderLabels[key]}
-                                </label>
-                                <span className="text-sm font-semibold text-blue-400 bg-gray-700 px-3 py-1 rounded">
-                  {formatValue(key, state[key])}
-                </span>
+                                <div className="flex items-center gap-2">
+                                    <Icon size={18} className="text-blue-600" />
+                                    <span className="text-sm font-medium text-gray-700">{label}</span>
+                                </div>
+                                <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                    {formatValue(key, state[key])}
+                                </span>
                             </div>
+
                             <input
                                 type="range"
                                 min={config.min}
@@ -62,32 +74,39 @@ export default function ImageEditor({
                                 step={config.step}
                                 value={state[key]}
                                 onChange={(e) => onChange(key, parseFloat(e.target.value))}
-                                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                style={{
+                                    background: getSliderBackground(key, state[key])
+                                }}
                             />
+
+                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>{config.min}{config.unit}</span>
+                                <span>{config.max}{config.unit}</span>
+                            </div>
                         </div>
                     );
                 })}
-            </div>
 
-            <div className="flex gap-3 mt-6">
-                <button
-                    onClick={onUndo}
-                    disabled={!canUndo}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed py-2 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-                    title="Desfazer"
-                >
-                    <Undo2 size={18} />
-                    Desfazer
-                </button>
-                <button
-                    onClick={onRedo}
-                    disabled={!canRedo}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed py-2 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-                    title="Refazer"
-                >
-                    <Redo2 size={18} />
-                    Refazer
-                </button>
+                {/* Controles de Histórico */}
+                <div className="flex gap-2 pt-4 mt-4 border-t border-gray-200">
+                    <button
+                        onClick={onUndo}
+                        disabled={!canUndo}
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed py-2 px-3 rounded text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                    >
+                        <Undo2 size={16} />
+                        Desfazer
+                    </button>
+                    <button
+                        onClick={onRedo}
+                        disabled={!canRedo}
+                        className="flex-1 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed py-2 px-3 rounded text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                    >
+                        <Redo2 size={16} />
+                        Refazer
+                    </button>
+                </div>
             </div>
         </div>
     );

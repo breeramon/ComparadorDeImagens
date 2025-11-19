@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'Comparador de Imagens - E02 Grupo6',
-    description: 'Sistema de comparação de imagens com métricas SSIM e diferença média',
+    title: 'ImagePro - Sistema Profissional de Comparação de Imagens',
+    description: 'Compare e edite imagens com métricas avançadas SSIM e diferença média',
 };
 
 export default function RootLayout({
@@ -13,7 +13,11 @@ export default function RootLayout({
 }) {
     return (
         <html lang="pt-BR">
-        <body className="antialiased">{children}</body>
+        <body>
+        <div className="app-container">
+            {children}
+        </div>
+        </body>
         </html>
     );
 }

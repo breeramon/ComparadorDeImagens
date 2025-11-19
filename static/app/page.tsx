@@ -1,226 +1,222 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
-import ImageUploader from '../components/ImageUploader';
-import ImageEditor from '../components/ImageEditor';
-import PreviewPanel from '../components/PreviewPanel';
-import ComparisonResults from '../components/ComparisonResults';
-import { EditorState, DEFAULT_STATE, ComparisonResult } from '../lib/types';
-import { previewImage, compareImages, downloadCSV } from '../lib/api';
+import React, { useState } from 'react';
+import { Upload, ArrowRight, CheckCircle, FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '../lib/types';
 
-export default function Home() {
-    const [currentFile, setCurrentFile] = useState<File | null>(null);
-    const [originalUrl, setOriginalUrl] = useState<string>('');
-    const [editedUrl, setEditedUrl] = useState<string>('');
-    const [editorState, setEditorState] = useState<EditorState>(DEFAULT_STATE);
-    const [results, setResults] = useState<ComparisonResult | null>(null);
-
-    const [editHistory, setEditHistory] = useState<EditorState[]>([DEFAULT_STATE]);
-    const [redoStack, setRedoStack] = useState<EditorState[]>([]);
-    const [historyIndex, setHistoryIndex] = useState<number>(0);
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
+export default function UploadPage() {
+    const router = useRouter();
+    const [file, setFile] = useState<File | null>(null);
+    const [fileName, setFileName] = useState<string>('');
+    const [fileSize, setFileSize] = useState<string>('');
+    const [isDragOver, setIsDragOver] = useState(false);
     const [error, setError] = useState<string>('');
-    const [status, setStatus] = useState<string>('');
 
-    // Debounce para preview automático
-    const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+    const validateFile = (file: File): string | null => {
+        const fileName = file.name.toLowerCase();
+        const validExtension = ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext));
 
-    const handleImageSelect = (file: File, previewUrl: string) => {
-        setCurrentFile(file);
-        setOriginalUrl(previewUrl);
-        setEditedUrl(previewUrl);
-        setEditorState(DEFAULT_STATE);
-        setEditHistory([DEFAULT_STATE]);
-        setRedoStack([]);
-        setHistoryIndex(0);
-        setResults(null);
-        setStatus('Imagem carregada. Ajuste os parâmetros.');
-    };
-
-    const updatePreview = useCallback(
-        async (state: EditorState) => {
-            if (!currentFile) return;
-
-            setIsLoading(true);
-            setStatus('Atualizando preview...');
-
-            try {
-                const result = await previewImage(currentFile, state);
-                setEditedUrl(`${result.edited_url}?t=${Date.now()}`);
-                setStatus('Preview atualizado');
-            } catch (err: any) {
-                setError(err.message);
-                setStatus('Erro no preview');
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        [currentFile]
-    );
-
-    const handleEditorChange = (key: keyof EditorState, value: number) => {
-        const newState = { ...editorState, [key]: value };
-        setEditorState(newState);
-
-        // Limpar timer anterior
-        if (debounceTimer) {
-            clearTimeout(debounceTimer);
+        if (!validExtension) {
+            return `Formato não suportado. Use: ${ALLOWED_EXTENSIONS.join(', ')}`;
         }
 
-        // Criar novo timer para debounce (500ms)
-        const timer = setTimeout(() => {
-            // Salvar no histórico
-            const newHistory = editHistory.slice(0, historyIndex + 1);
-            newHistory.push(newState);
-            setEditHistory(newHistory);
-            setHistoryIndex(newHistory.length - 1);
-            setRedoStack([]);
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            return `Arquivo muito grande. Máximo permitido: ${MAX_FILE_SIZE_MB}MB`;
+        }
 
-            // Atualizar preview
-            updatePreview(newState);
-        }, 500);
-
-        setDebounceTimer(timer);
+        return null;
     };
 
-    const handleUndo = () => {
-        if (historyIndex <= 0) return;
-
-        const newIndex = historyIndex - 1;
-        const stateToApply = editHistory[newIndex];
-
-        setRedoStack([editorState, ...redoStack]);
-        setEditorState(stateToApply);
-        setHistoryIndex(newIndex);
-        updatePreview(stateToApply);
+    const formatFileSize = (bytes: number): string => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    const handleRedo = () => {
-        if (redoStack.length === 0) return;
-
-        const [stateToApply, ...newRedoStack] = redoStack;
-        const newHistory = [...editHistory.slice(0, historyIndex + 1), stateToApply];
-
-        setEditHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
-        setEditorState(stateToApply);
-        setRedoStack(newRedoStack);
-        updatePreview(stateToApply);
-    };
-
-    const handleCompare = async () => {
-        if (!currentFile) {
-            setError('Selecione uma imagem primeiro');
+    const handleFileSelect = (selectedFile: File) => {
+        const error = validateFile(selectedFile);
+        if (error) {
+            setError(error);
+            setFile(null);
+            setFileName('');
+            setFileSize('');
             return;
         }
 
-        setIsLoading(true);
-        setStatus('Processando comparação final...');
+        setFile(selectedFile);
+        setFileName(selectedFile.name);
+        setFileSize(formatFileSize(selectedFile.size));
         setError('');
+    };
 
-        try {
-            const result = await compareImages(currentFile, editorState);
-            setResults(result);
-            setStatus('Comparação concluída!');
-        } catch (err: any) {
-            setError(err.message);
-            setStatus('Erro na comparação');
-        } finally {
-            setIsLoading(false);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            handleFileSelect(selectedFile);
         }
     };
 
-    const handleDownloadCSV = async () => {
-        setIsDownloading(true);
-        setError('');
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragOver(true);
+    };
 
-        try {
-            await downloadCSV();
-            setStatus('Ranking baixado com sucesso!');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setIsDownloading(false);
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragOver(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) {
+            handleFileSelect(droppedFile);
         }
     };
 
-    // Cleanup do debounce
-    useEffect(() => {
-        return () => {
-            if (debounceTimer) {
-                clearTimeout(debounceTimer);
-            }
+    const handleContinue = () => {
+        if (!file) {
+            setError('Selecione uma imagem para continuar');
+            return;
+        }
+
+        // Criar preview URL
+        const previewUrl = URL.createObjectURL(file);
+
+        // Salvar a imagem no sessionStorage para usar na próxima página
+        const imageData = {
+            file: file, // File object completo
+            previewUrl: previewUrl,
+            name: file.name,
+            size: file.size,
+            type: file.type
         };
-    }, [debounceTimer]);
+
+        sessionStorage.setItem('currentImage', JSON.stringify(imageData));
+        router.push('/edit');
+    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white p-8">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <header className="text-center mb-12">
-                    <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                        Comparador de Imagens
-                    </h1>
-                    <p className="text-gray-300 text-lg">
-                        Ajuste parâmetros e compare imagens com métricas avançadas
-                    </p>
-                </header>
+        <div className="fade-in">
+            {/* Header */}
+            <header className="app-header">
+                <h1 className="app-title">ImagePro</h1>
+                <p className="app-subtitle">
+                    Sistema profissional de comparação e edição de imagens com métricas avançadas
+                </p>
+            </header>
 
-                {/* Status e Erros */}
-                {status && (
-                    <div className="bg-blue-900 border border-blue-700 text-blue-200 px-4 py-3 rounded mb-6">
-                        {status}
+            {/* Progress Steps */}
+            <div className="progress-steps">
+                <div className="step active">
+                    <div className="step-number">1</div>
+                    <div className="step-label">Upload da Imagem</div>
+                    <div className="step-connector"></div>
+                </div>
+                <div className="step">
+                    <div className="step-number">2</div>
+                    <div className="step-label">Edição</div>
+                    <div className="step-connector"></div>
+                </div>
+                <div className="step">
+                    <div className="step-number">3</div>
+                    <div className="step-label">Resultados</div>
+                </div>
+            </div>
+
+            {/* Upload Card */}
+            <div className="card">
+                <div className="card-header">
+                    <div className="card-icon">
+                        <Upload size={24} />
                     </div>
-                )}
+                    <div>
+                        <h2 className="card-title">Upload da Imagem</h2>
+                        <p className="card-description">
+                            Faça upload da imagem que deseja editar e comparar
+                        </p>
+                    </div>
+                </div>
+
+                {/* Upload Area */}
+                <div className="upload-container">
+                    <input
+                        type="file"
+                        className="hidden"
+                        accept={ALLOWED_EXTENSIONS.join(',')}
+                        onChange={handleFileChange}
+                        id="file-upload"
+                    />
+
+                    <label htmlFor="file-upload">
+                        <div
+                            className={`upload-area ${isDragOver ? 'drag-over' : ''} ${
+                                file ? 'border-green-400 bg-green-50' : ''
+                            }`}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                        >
+                            {file ? (
+                                <div className="upload-content">
+                                    <div className="upload-icon">
+                                        <CheckCircle size={64} className="text-green-500" />
+                                    </div>
+                                    <div className="upload-text">
+                                        <h3>Imagem Carregada com Sucesso!</h3>
+                                        <p>Clique ou arraste para alterar a imagem</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="upload-content">
+                                    <div className="upload-icon">
+                                        <Upload size={64} />
+                                    </div>
+                                    <div className="upload-text">
+                                        <h3>Arraste e solte sua imagem aqui</h3>
+                                        <p>ou clique para selecionar</p>
+                                    </div>
+                                    <div className="upload-requirements">
+                                        <p>Formatos suportados: {ALLOWED_EXTENSIONS.join(', ').toUpperCase()}</p>
+                                        <p>Tamanho máximo: {MAX_FILE_SIZE_MB}MB</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </label>
+
+                    {file && (
+                        <div className="file-info">
+                            <div className="file-name">
+                                <FileText size={16} />
+                                {fileName}
+                            </div>
+                            <div className="file-size">{fileSize}</div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Error Message */}
                 {error && (
-                    <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-6">
+                    <div className="status-message status-error">
                         {error}
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar - Upload e Editor */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <ImageUploader onImageSelect={handleImageSelect} onError={setError} />
-
-                        {currentFile && (
-                            <ImageEditor
-                                state={editorState}
-                                onChange={handleEditorChange}
-                                onUndo={handleUndo}
-                                onRedo={handleRedo}
-                                canUndo={historyIndex > 0}
-                                canRedo={redoStack.length > 0}
-                            />
-                        )}
-                    </div>
-
-                    {/* Main Content - Preview e Resultados */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <PreviewPanel
-                            originalUrl={originalUrl}
-                            editedUrl={editedUrl}
-                            isLoading={isLoading}
-                        />
-
-                        {currentFile && (
-                            <button
-                                onClick={handleCompare}
-                                disabled={isLoading}
-                                className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed py-3 px-6 rounded-lg font-semibold text-lg transition-colors"
-                            >
-                                {isLoading ? 'Processando...' : '3. Comparar Imagem Editada'}
-                            </button>
-                        )}
-
-                        <ComparisonResults
-                            results={results}
-                            onDownloadCSV={handleDownloadCSV}
-                            isDownloading={isDownloading}
-                        />
-                    </div>
+                {/* Action Buttons */}
+                <div className="btn-group">
+                    <button
+                        onClick={handleContinue}
+                        disabled={!file}
+                        className="btn btn-primary"
+                    >
+                        Continuar para Edição
+                        <ArrowRight size={20} />
+                    </button>
                 </div>
             </div>
         </div>

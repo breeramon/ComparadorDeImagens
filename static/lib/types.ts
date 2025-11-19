@@ -6,18 +6,6 @@ export interface EditorState {
     redim: number;
 }
 
-export interface ComparisonResult {
-    ssim_score: number;
-    diferenca_media: number;
-    original_url: string;
-    edited_url: string;
-    diff_map_url: string;
-}
-
-export interface PreviewResult {
-    edited_url: string;
-}
-
 export const DEFAULT_STATE: EditorState = {
     brilho: 0,
     contraste: 1.0,
@@ -28,12 +16,20 @@ export const DEFAULT_STATE: EditorState = {
 
 export const SLIDER_CONFIGS = {
     brilho: { min: -100, max: 100, step: 1, unit: '' },
-    contraste: { min: 0.5, max: 3.0, step: 0.1, unit: '' },
-    saturacao: { min: 0.0, max: 3.0, step: 0.1, unit: '' },
-    rotacao: { min: 0, max: 360, step: 1, unit: '°' },
-    redim: { min: 10, max: 200, step: 5, unit: '%' },
+    contraste: { min: 0.1, max: 3.0, step: 0.1, unit: 'x' },
+    saturacao: { min: 0.0, max: 3.0, step: 0.1, unit: 'x' },
+    rotacao: { min: -180, max: 180, step: 1, unit: '°' },
+    redim: { min: 10, max: 200, step: 1, unit: '%' },
 };
 
-export const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png'];
+export interface ComparisonResult {
+    ssim_score: number;
+    diferenca_media: number;
+    original_url: string;
+    edited_url: string;
+    diff_map_url: string;
+}
+
+export const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
 export const MAX_FILE_SIZE_MB = 5;
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
