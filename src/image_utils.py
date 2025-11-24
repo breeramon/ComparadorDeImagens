@@ -15,6 +15,11 @@ def calcular_diferenca_media(img1, img2):
     if img1.shape != img2.shape:
         img2 = cv.resize(img2, (img1.shape[1], img1.shape[0]))
 
+        if len(img1.shape) == 2 and len(img2.shape) == 3:
+            img1 = cv.cvtColor(img1, cv.COLOR_GRAY2BGR)
+        elif len(img1.shape) == 3 and len(img2.shape) == 2:
+            img2 = cv.cvtColor(img2, cv.COLOR_GRAY2BGR)
+
     diferenca = cv.absdiff(img1.astype("float"), img2.astype("float"))
     media_diferenca = np.mean(diferenca)
     return media_diferenca
@@ -26,7 +31,7 @@ def calcular_ssim(img1, img2):
     if img1_cinza.shape != img2_cinza.shape:
         img2_cinza = cv.resize(img2_cinza, (img1_cinza.shape[1], img1_cinza.shape[0]))
 
-    (score, diff_map_url) = structural_similarity(img1_cinza, img2_cinza, full=True, data_range=255)
+    (score, diff_map) = structural_similarity(img1_cinza, img2_cinza, full=True, data_range=255)
 
     return score
 

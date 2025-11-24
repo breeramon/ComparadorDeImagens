@@ -310,48 +310,57 @@ compareButton.addEventListener('click', async () => {
     compareButton.disabled = true;
     compareButton.innerHTML = '<span class="loading-spinner"></span> Analisando...';
 
-    try {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+    statusDiv.innerHTML = "";
 
-        const ssimScore = (0.8 + Math.random() * 0.19).toFixed(4);
-        const diffMedia = (Math.random() * 25).toFixed(2);
+    const formData = new FormData();
+    formData.append('originalImage', currentFile);
+
+    const state = getCurrentState();
+    formData.append('brilho', state.brilho);
+    formData.append('contraste', state.contraste);
+    formData.append('saturacao', state.saturacao);
+    formData.append('rotacao', state.rotacao);
+    formData.append('redim', state.redim);
+
+    try {
+        const response = await fetch('/api/compare', {
+            method: 'POST',
+            body: formData
+        });
+
+        const results = await response.json();
+
+        if (!response.ok) {
+            throw new Error(results.error || 'Erro no processamento do servidor.');
+        }
 
         showStatus('Análise concluída com sucesso!', 'info');
 
-        ssimScoreEl.textContent = ssimScore;
-        diffMediaEl.textContent = diffMedia;
+        ssimScoreEl.textContent = parseFloat(results.ssim_score).toFixed(4);
+        diffMediaEl.textContent = parseFloat(results.diferenca_media).toFixed(4);
 
-        resultImgOriginal.src = imgPreviewOriginal.src;
+        const timestamp = new Date().getTime();
+
+        resultImgOriginal.src = results.original_url + '?t=' + timestamp;
         resultImgOriginal.style.display = 'block';
-        resultImgOriginal.parentElement.querySelector('.preview-placeholder').style.display = 'none';
+        const placeholderOriginal = resultImgOriginal.parentElement.querySelector('.preview-placeholder');
+        if(placeholderOriginal) placeholderOriginal.style.display = 'none';
 
-        resultImgEdited.src = imgPreviewEdited.src;
+        resultImgEdited.src = results.edited_url + '?t=' + timestamp;
         resultImgEdited.style.display = 'block';
-        resultImgEdited.parentElement.querySelector('.preview-placeholder').style.display = 'none';
+        const placeholderEdited = resultImgEdited.parentElement.querySelector('.preview-placeholder');
+        if(placeholderEdited) placeholderEdited.style.display = 'none';
 
-        const diffCanvas = document.createElement('canvas');
-        const diffCtx = diffCanvas.getContext('2d');
-        diffCanvas.width = canvas.width;
-        diffCanvas.height = canvas.height;
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-
-        for (let i = 0; i < data.length; i += 4) {
-            const diff = Math.random() > 0.7 ? 255 : 0;
-            data[i] = diff;     
-            data[i + 1] = 0;    
-            data[i + 2] = 0;    
-        }
-
-        diffCtx.putImageData(imageData, 0, 0);
-        resultImgMap.src = diffCanvas.toDataURL();
+        resultImgMap.src = results.diff_map_url + '?t=' + timestamp;
         resultImgMap.style.display = 'block';
-        resultImgMap.parentElement.querySelector('.preview-placeholder').style.display = 'none';
+        const placeholderMap = resultImgMap.parentElement.querySelector('.preview-placeholder');
+        if(placeholderMap) placeholderMap.style.display = 'none';
+
+        goToPhase('analysis');
 
     } catch (error) {
         console.error("Erro:", error);
-        showError(`Erro: ${error.message}`);
+        showError(`Erro ao conectar com o servidor: ${error.message}`);
     } finally {
         compareButton.disabled = false;
         compareButton.innerHTML = '<i class="fas fa-chart-line"></i> Analisar Diferenças';
@@ -359,17 +368,7 @@ compareButton.addEventListener('click', async () => {
 });
 
 downloadCsv.addEventListener('click', () => {
-    const csvContent = "data:text/csv;charset=utf-8,"
-        + "Nome,SSIM,Diferença Média\n"
-        + "Imagem 1," + ssimScoreEl.textContent + "," + diffMediaEl.textContent;
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "analise_imagens.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    window.location.href = '/api/get_csv';
 });
 
 function showStatus(message, type) {
