@@ -1,6 +1,6 @@
-# 🖼️ Comparador de Imagens - Processamento Digital
+# 🖼️ Comparação de Imagens Simples
 
-> Projeto acadêmico para a disciplina de Processamento de Imagens  
+> Projeto acadêmico para a disciplina de Processamento de Imagens de Coomputação Gráfica 
 > **Ciência da Computação - Universidade Tiradentes (UNIT)**
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
