@@ -381,4 +381,16 @@ Universidade Tiradentes (UNIT)
 
 <img width="997" height="618" alt="Funcionalidade de exportação de ranking em formato CSV" src="https://github.com/user-attachments/assets/f58ee81f-ed93-46bd-a454-1b2a213a21fc" />
 
+### Imagens do Projeto com o front reformulado
 
+<img width="3827" height="2094" alt="image" src="https://github.com/user-attachments/assets/95a31dfe-b7ae-407b-bc55-9140244c01dd" />
+
+<img width="3838" height="2100" alt="image" src="https://github.com/user-attachments/assets/59096b04-cd92-4fec-8383-c02dfd82fbbe" />
+
+<img width="3836" height="2098" alt="image" src="https://github.com/user-attachments/assets/e1706545-3be3-496d-ac09-8178af86b34d" />
+
+<img width="3834" height="2101" alt="image" src="https://github.com/user-attachments/assets/0ca10e38-6692-4113-83da-2a18e2357b0f" />
+
+<img width="3837" height="2098" alt="image" src="https://github.com/user-attachments/assets/50a2be54-1775-4cef-8ef3-430a99769a2b" />
+
+<img width="3831" height="2089" alt="image" src="https://github.com/user-attachments/assets/7e7bf157-ed9b-430c-b47f-cfa358f78b7b" />
